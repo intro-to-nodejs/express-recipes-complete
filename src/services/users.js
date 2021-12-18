@@ -45,7 +45,7 @@ const create = async ({ email, name, password }) => {
 
 const find = async ({ id, email }) => {
   const users = JSON.parse(await fs.readFile(usersFilePath));
-  return users.find((user) => user.id === id || user.email === email);
+  return users.find((user) => user.id === parseInt(id) || user.email === email);
 };
 
 module.exports = {
