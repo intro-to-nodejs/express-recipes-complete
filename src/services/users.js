@@ -11,7 +11,7 @@ const authenticate = async ({ id, email, password }) => {
   const user = await find({ email });
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
-  if (!user || !isPasswordValid) {
+  if (!isPasswordValid) {
     throw new Error("Unable to login");
   }
 
@@ -24,11 +24,6 @@ const authenticate = async ({ id, email, password }) => {
 
 const create = async ({ email, name, password }) => {
   const users = JSON.parse(await fs.readFile(usersFilePath));
-  const user = await find({ email });
-
-  if (user) {
-    throw new Error("Email already exists!");
-  }
 
   const newUser = {
     id: users.length + 1, // Not a robust database incrementor; don't use in production
@@ -49,14 +44,8 @@ const create = async ({ email, name, password }) => {
 };
 
 const find = async ({ id, email }) => {
-  const data = await fs.readFile(usersFilePath);
-  const users = JSON.parse(data);
-
-  const existingUser = users.find(
-    (user) => user.id === id || user.email === email
-  );
-
-  return existingUser;
+  const users = JSON.parse(await fs.readFile(usersFilePath));
+  return users.find((user) => user.id === id || user.email === email);
 };
 
 module.exports = {

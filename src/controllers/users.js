@@ -1,8 +1,15 @@
-const { create, authenticate } = require("../services/users");
+const { create, authenticate, find } = require("../services/users");
 
 const handleSignup = async (req, res, next) => {
-  const { name, email, password } = req.body;
   try {
+    const { name, email, password } = req.body;
+
+    const user = await find({ email });
+
+    if (user) {
+      throw new Error("Email already exists!");
+    }
+
     const { token } = await create({ name, email, password });
     res.json({ token });
   } catch (error) {
@@ -11,8 +18,14 @@ const handleSignup = async (req, res, next) => {
 };
 
 const handleLogin = async (req, res, next) => {
-  const { email, password } = req.body;
   try {
+    const { email, password } = req.body;
+    const user = await find({ email });
+
+    if (!user) {
+      throw new Error("Unable to login");
+    }
+
     const { token } = await authenticate({ email, password });
     res.json({ token });
   } catch (error) {
